@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}My Complaints - Smart GP Portal{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="fw-bold mb-4">My Complaints</h2>
+
+    <!-- Filter Bar -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <form method="GET" action="{{ url_for('citizen.my_complaints') }}" class="row g-2 align-items-end">
+                <div class="col-md-4">
+                    <label for="status" class="form-label">Filter by Status</label>
+                    <select class="form-select" id="status" name="status">
+                        <option value="">All</option>
+                        <option value="Submitted" {{ 'selected' if request.args.get('status') == 'Submitted' }}>Submitted</option>
+                        <option value="Under Review" {{ 'selected' if request.args.get('status') == 'Under Review' }}>Under Review</option>
+                        <option value="Assigned" {{ 'selected' if request.args.get('status') == 'Assigned' }}>Assigned</option>
+                        <option value="In Progress" {{ 'selected' if request.args.get('status') == 'In Progress' }}>In Progress</option>
+                        <option value="Resolved" {{ 'selected' if request.args.get('status') == 'Resolved' }}>Resolved</option>
+                        <option value="Reopened" {{ 'selected' if request.args.get('status') == 'Reopened' }}>Reopened</option>
+                        <option value="Rejected" {{ 'selected' if request.args.get('status') == 'Rejected' }}>Rejected</option>
+                        <option value="Closed" {{ 'selected' if request.args.get('status') == 'Closed' }}>Closed</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-success w-100">Filter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Complaints Table -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            {% if complaints %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Complaint ID</th>
+                                <th>Title</th>
+                                <th>Category</th>
+                                <th>Ward</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for complaint in complaints %}
+                            <tr>
+                                <td><small class="fw-semibold">{{ complaint.complaint_uid }}</small></td>
+                                <td>{{ complaint.title }}</td>
+                                <td><small>{{ complaint.category }}</small></td>
+                                <td><small>{{ complaint.ward }}</small></td>
+                                <td>
+                                    {% if complaint.status == 'Submitted' %}
+                                        <span class="badge bg-secondary">{{ complaint.status }}</span>
+                                    {% elif complaint.status == 'Under Review' %}
+                                        <span class="badge bg-info">{{ complaint.status }}</span>
+                                    {% elif complaint.status == 'Assigned' %}
+                                        <span class="badge bg-primary">{{ complaint.status }}</span>
+                                    {% elif complaint.status == 'In Progress' %}
+                                        <span class="badge bg-warning text-dark">{{ complaint.status }}</span>
+                                    {% elif complaint.status == 'Resolved' %}
+                                        <span class="badge bg-success">{{ complaint.status }}</span>
+                                    {% elif complaint.status == 'Reopened' %}
+                                        <span class="badge bg-danger">{{ complaint.status }}</span>
+                                    {% elif complaint.status == 'Rejected' %}
+                                        <span class="badge bg-dark">{{ complaint.status }}</span>
+                                    {% elif complaint.status == 'Closed' %}
+                                        <span class="badge bg-secondary">{{ complaint.status }}</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{ complaint.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td><small>{{ complaint.created_at }}</small></td>
+                                <td>
+                                    <a href="{{ url_for('citizen.complaint_detail', id=complaint.id) }}" class="btn btn-outline-success btn-sm">View</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-4 text-muted">
+                    <p>No complaints found.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

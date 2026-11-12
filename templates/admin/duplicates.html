@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}Duplicate Complaint Verification - Admin{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">🤖 AI-Flagged Duplicate Complaints</h2>
+            <p class="text-muted mb-0">Compare new complaints with existing records and confirm or reject links</p>
+        </div>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary btn-sm">&larr; Back to Dashboard</a>
+    </div>
+
+    {% if duplicates %}
+        <div class="row g-4">
+            {% for d in duplicates %}
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="fw-bold text-dark">Duplicate Review Case #{{ d.id }}</span>
+                                <span class="text-muted small ms-2">Flagged by TF-IDF & Cosine Similarity</span>
+                            </div>
+                            <div>
+                                <span class="badge bg-warning text-dark fs-6">
+                                    Similarity: {{ (d.similarity_score * 100)|round(1) }}%
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="row g-4">
+                                <!-- Potential Duplicate (New) -->
+                                <div class="col-md-6">
+                                    <div class="p-3 border rounded-3 bg-light h-100">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="badge bg-primary">Newly Submitted Complaint</span>
+                                            <span class="fw-bold text-success">{{ d.dup_uid }}</span>
+                                        </div>
+                                        <h5 class="fw-bold mb-2">{{ d.dup_title }}</h5>
+                                        <div class="small text-muted mb-2">
+                                            <span class="badge bg-white text-dark border me-1">{{ d.dup_category }}</span>
+                                            <span class="badge bg-white text-dark border">{{ d.dup_ward }}</span>
+                                        </div>
+                                        <a href="{{ url_for('admin.complaint_detail', id=d.duplicate_complaint_id) }}" target="_blank" class="btn btn-sm btn-link p-0">View Full Details &rarr;</a>
+                                    </div>
+                                </div>
+
+                                <!-- Existing Parent Complaint -->
+                                <div class="col-md-6">
+                                    <div class="p-3 border rounded-3 bg-light h-100">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="badge bg-secondary">Existing Parent Complaint</span>
+                                            <span class="fw-bold text-primary">{{ d.parent_uid }}</span>
+                                        </div>
+                                        <h5 class="fw-bold mb-2">{{ d.parent_title }}</h5>
+                                        <div class="small text-muted mb-2">
+                                            <span class="badge bg-white text-dark border me-1">{{ d.parent_category }}</span>
+                                            <span class="badge bg-white text-dark border">{{ d.parent_ward }}</span>
+                                        </div>
+                                        <a href="{{ url_for('admin.complaint_detail', id=d.parent_complaint_id) }}" target="_blank" class="btn btn-sm btn-link p-0">View Full Details &rarr;</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-footer bg-white py-3 d-flex justify-content-end gap-2">
+                            <!-- Reject Button -->
+                            <form method="POST" action="{{ url_for('admin.verify_duplicate', id=d.id) }}">
+                                <input type="hidden" name="action" value="reject">
+                                <button type="submit" class="btn btn-outline-danger btn-sm px-3" onclick="return confirm('Reject this duplicate suggestion? Both complaints will remain independent.');">
+                                    ✗ Not a Duplicate (Keep Separate)
+                                </button>
+                            </form>
+                            <!-- Confirm Button -->
+                            <form method="POST" action="{{ url_for('admin.verify_duplicate', id=d.id) }}">
+                                <input type="hidden" name="action" value="confirm">
+                                <button type="submit" class="btn btn-success btn-sm px-3" onclick="return confirm('Confirm and link this duplicate complaint to the parent ticket?');">
+                                    ✓ Confirm & Link Duplicate
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card border-0 shadow-sm text-center py-5">
+            <div class="card-body">
+                <div class="display-4 text-success mb-3">✅</div>
+                <h5 class="fw-bold text-dark">No Pending Duplicate Verifications</h5>
+                <p class="text-muted small">All complaints have been reviewed or no similar grievances were detected by the AI system.</p>
+                <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-success mt-2">Return to Dashboard</a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+

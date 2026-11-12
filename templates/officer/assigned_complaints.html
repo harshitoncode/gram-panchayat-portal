@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}My Assigned Complaints - Officer{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">My Assigned Complaints</h2>
+            <p class="text-muted mb-0">Complaints assigned to you for field investigation and resolution</p>
+        </div>
+        <a href="{{ url_for('officer.dashboard') }}" class="btn btn-outline-secondary btn-sm">&larr; Back to Dashboard</a>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <form method="GET" action="{{ url_for('officer.assigned_complaints') }}" class="row g-2 align-items-center">
+                <div class="col-auto">
+                    <label class="form-label small fw-semibold mb-0">Status:</label>
+                </div>
+                <div class="col-md-3">
+                    <select name="status" class="form-select form-select-sm">
+                        <option value="">All Statuses</option>
+                        <option value="Assigned" {% if status_filter == 'Assigned' %}selected{% endif %}>Assigned</option>
+                        <option value="In Progress" {% if status_filter == 'In Progress' %}selected{% endif %}>In Progress</option>
+                        <option value="Resolved" {% if status_filter == 'Resolved' %}selected{% endif %}>Resolved</option>
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-sm btn-success">Filter</button>
+                    {% if status_filter %}
+                        <a href="{{ url_for('officer.assigned_complaints') }}" class="btn btn-sm btn-link text-secondary">Clear</a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            {% if complaints %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-3">Complaint ID</th>
+                                <th>Title</th>
+                                <th>Category</th>
+                                <th>Ward</th>
+                                <th>Status</th>
+                                <th>Assigned Date</th>
+                                <th class="text-end pe-3">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for c in complaints %}
+                                <tr>
+                                    <td class="ps-3 fw-bold text-success">{{ c.complaint_uid }}</td>
+                                    <td>
+                                        <div class="fw-semibold">{{ c.title }}</div>
+                                        <small class="text-muted">{{ c.location_detail or 'Ward location' }}</small>
+                                    </td>
+                                    <td><span class="badge bg-light text-dark border">{{ c.category }}</span></td>
+                                    <td>{{ c.ward }}</td>
+                                    <td>
+                                        {% if c.status == 'Assigned' %}
+                                            <span class="badge bg-primary">Assigned</span>
+                                        {% elif c.status == 'In Progress' %}
+                                            <span class="badge bg-warning text-dark">In Progress</span>
+                                        {% elif c.status == 'Resolved' %}
+                                            <span class="badge bg-success">Resolved</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ c.status }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-muted small">{{ c.created_at }}</td>
+                                    <td class="text-end pe-3">
+                                        <a href="{{ url_for('officer.complaint_detail', id=c.id) }}" class="btn btn-sm btn-outline-success">Update Progress</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <p class="text-muted mb-0">No complaints assigned to you matching this filter.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+

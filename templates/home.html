@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}Smart GP Portal - Digital Governance for Rural India{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section text-white text-center py-5" style="background: linear-gradient(135deg, #1b5e20, #388e3c, #2e7d32);">
+    <div class="container py-5">
+        <h1 class="display-4 fw-bold mb-3">Smart Gram Panchayat Complaint Portal</h1>
+        <p class="lead mb-4">Digital Governance for Rural India</p>
+        <p class="mb-4">Submit, track, and resolve your civic complaints easily with our AI-powered platform.</p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <a href="{{ url_for('auth.register') }}" class="btn btn-warning btn-lg px-4 fw-semibold">Register Now</a>
+            <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light btn-lg px-4">Track Complaint</a>
+        </div>
+    </div>
+</section>
+
+<!-- Feature Cards -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center fw-bold mb-5">Our Features</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 text-center border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="display-3 mb-3">📝</div>
+                        <h5 class="card-title fw-bold">Submit Complaints</h5>
+                        <p class="card-text text-muted">Easily submit your civic complaints online with details, category, and supporting images.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 text-center border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="display-3 mb-3">🔍</div>
+                        <h5 class="card-title fw-bold">Track Progress</h5>
+                        <p class="card-text text-muted">Track your complaint status in real-time with a detailed history of every update.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 text-center border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="display-3 mb-3">🤖</div>
+                        <h5 class="card-title fw-bold">AI-Powered Detection</h5>
+                        <p class="card-text text-muted">Our AI automatically detects duplicate complaints to speed up resolution.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center fw-bold mb-5">How It Works</h2>
+        <div class="row g-4 text-center">
+            <div class="col-md-3 col-6">
+                <div class="rounded-circle bg-success text-white d-inline-flex align-items-center justify-content-center mb-3" style="width:64px;height:64px;font-size:1.5rem;font-weight:bold;">1</div>
+                <h5 class="fw-bold">Register</h5>
+                <p class="text-muted small">Create your free account with your mobile number</p>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="rounded-circle bg-success text-white d-inline-flex align-items-center justify-content-center mb-3" style="width:64px;height:64px;font-size:1.5rem;font-weight:bold;">2</div>
+                <h5 class="fw-bold">Submit</h5>
+                <p class="text-muted small">Describe your complaint with category and location</p>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="rounded-circle bg-success text-white d-inline-flex align-items-center justify-content-center mb-3" style="width:64px;height:64px;font-size:1.5rem;font-weight:bold;">3</div>
+                <h5 class="fw-bold">Track</h5>
+                <p class="text-muted small">Monitor progress with real-time status updates</p>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="rounded-circle bg-success text-white d-inline-flex align-items-center justify-content-center mb-3" style="width:64px;height:64px;font-size:1.5rem;font-weight:bold;">4</div>
+                <h5 class="fw-bold">Resolved</h5>
+                <p class="text-muted small">Get notified when your complaint is resolved</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

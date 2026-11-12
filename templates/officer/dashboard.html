@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Officer Dashboard - Smart GP Portal{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+        <div>
+            <h2 class="fw-bold text-success mb-1">Panchayat Officer Dashboard</h2>
+            <p class="text-muted mb-0">Welcome, {{ session.get('user_name') }}! Overview of complaints assigned to you.</p>
+        </div>
+        <a href="{{ url_for('officer.assigned_complaints') }}" class="btn btn-outline-success">View Assigned Complaints</a>
+    </div>
+
+    <!-- Status Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm text-center p-3 h-100 bg-white">
+                <div class="text-muted small text-uppercase fw-bold">New Assigned Tasks</div>
+                <div class="display-6 fw-bold text-primary mt-2">{{ status_counts.get('Assigned', 0) }}</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm text-center p-3 h-100 bg-white">
+                <div class="text-muted small text-uppercase fw-bold">Currently In Progress</div>
+                <div class="display-6 fw-bold text-warning mt-2">{{ status_counts.get('In Progress', 0) }}</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm text-center p-3 h-100 bg-white">
+                <div class="text-muted small text-uppercase fw-bold">Resolved Complaints</div>
+                <div class="display-6 fw-bold text-success mt-2">{{ status_counts.get('Resolved', 0) }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Action Banner -->
+    <div class="card border-0 shadow-sm p-4 bg-light">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="fw-bold mb-1">Manage Your Tasks</h5>
+                <p class="text-secondary small mb-0">Inspect citizen grievances, start investigations, and provide resolution remarks.</p>
+            </div>
+            <a href="{{ url_for('officer.assigned_complaints') }}" class="btn btn-success px-4 py-2">Go to My Tasks &rarr;</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

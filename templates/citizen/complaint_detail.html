@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+
+{% block title %}Complaint {{ complaint.complaint_uid }} - Smart GP Portal{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <a href="{{ url_for('citizen.my_complaints') }}" class="btn btn-outline-secondary btn-sm mb-3">&larr; Back to My Complaints</a>
+
+    <!-- Complaint Info Card -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold">{{ complaint.complaint_uid }}</h5>
+                {% if complaint.status == 'Submitted' %}
+                    <span class="badge bg-secondary fs-6">{{ complaint.status }}</span>
+                {% elif complaint.status == 'Under Review' %}
+                    <span class="badge bg-info fs-6">{{ complaint.status }}</span>
+                {% elif complaint.status == 'Assigned' %}
+                    <span class="badge bg-primary fs-6">{{ complaint.status }}</span>
+                {% elif complaint.status == 'In Progress' %}
+                    <span class="badge bg-warning text-dark fs-6">{{ complaint.status }}</span>
+                {% elif complaint.status == 'Resolved' %}
+                    <span class="badge bg-success fs-6">{{ complaint.status }}</span>
+                {% elif complaint.status == 'Reopened' %}
+                    <span class="badge bg-danger fs-6">{{ complaint.status }}</span>
+                {% elif complaint.status == 'Rejected' %}
+                    <span class="badge bg-dark fs-6">{{ complaint.status }}</span>
+                {% elif complaint.status == 'Closed' %}
+                    <span class="badge bg-secondary fs-6">{{ complaint.status }}</span>
+                {% else %}
+                    <span class="badge bg-secondary fs-6">{{ complaint.status }}</span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="card-body">
+            <h4 class="fw-bold mb-3">{{ complaint.title }}</h4>
+            <p>{{ complaint.description }}</p>
+            <div class="row">
+                <div class="col-md-4 mb-2">
+                    <strong>Category:</strong> {{ complaint.category }}
+                </div>
+                <div class="col-md-4 mb-2">
+                    <strong>Ward:</strong> {{ complaint.ward }}
+                </div>
+                <div class="col-md-4 mb-2">
+                    <strong>Location:</strong> {{ complaint.location_detail or 'N/A' }}
+                </div>
+            </div>
+            <div class="mt-2">
+                <strong>Submitted:</strong> {{ complaint.created_at }}
+            </div>
+            {% if complaint.image_path %}
+                <div class="mt-3">
+                    <strong>Attached Image:</strong><br>
+                    <img src="{{ url_for('static', filename=complaint.image_path) }}" class="img-thumbnail mt-2" style="max-width: 300px;" alt="Complaint Image">
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Parent Complaint Link -->
+    {% if complaint.parent_complaint_id %}
+        <div class="alert alert-info" role="alert">
+            <strong>ℹ️ Duplicate Notice:</strong> This complaint is linked to parent complaint
+            <strong>{{ (parent.complaint_uid if parent else (parent_complaint.complaint_uid if parent_complaint else 'Parent #' ~ complaint.parent_complaint_id)) }}</strong>.
+            <a href="{{ url_for('citizen.complaint_detail', id=complaint.parent_complaint_id) }}" class="alert-link">View Parent Complaint</a>
+        </div>
+    {% endif %}
+
+    <!-- Status History Timeline -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-white">
+            <h5 class="mb-0 fw-bold">Status History</h5>
+        </div>
+        <div class="card-body">
+            {% if history %}
+                <div class="timeline">
+                    {% for entry in history %}
+                        <div class="d-flex mb-3">
+                            <div class="flex-shrink-0 me-3">
+                                <div class="rounded-circle bg-success d-flex align-items-center justify-content-center" style="width:12px;height:12px;margin-top:6px;"></div>
+                            </div>
+                            <div class="border-start ps-3 pb-3" style="border-color: #dee2e6 !important;">
+                                <div class="fw-semibold">
+                                    {% if entry.old_status %}
+                                        {{ entry.old_status }} → {{ entry.new_status }}
+                                    {% else %}
+                                        {{ entry.new_status }}
+                                    {% endif %}
+                                </div>
+                                {% if entry.remarks %}
+                                    <div class="text-muted small">{{ entry.remarks }}</div>
+                                {% endif %}
+                                <div class="text-muted small">
+                                    {{ entry.updated_at }}
+                                    {% if entry.updated_by_name %} &mdash; by {{ entry.updated_by_name }}{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted mb-0">No status history available.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Feedback Section -->
+    {% if complaint.status == 'Resolved' and not feedback %}
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0 fw-bold">Submit Feedback</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('citizen.submit_feedback', id=complaint.id) }}">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Rating <span class="text-danger">*</span></label>
+                        <div class="d-flex gap-3">
+                            {% for i in range(1, 6) %}
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="rating" id="rating{{ i }}" value="{{ i }}" required>
+                                    <label class="form-check-label" for="rating{{ i }}">{{ '⭐' * i }}</label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="comments" class="form-label">Comments</label>
+                        <textarea class="form-control" id="comments" name="comments" rows="3" placeholder="Share your experience..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-success">Submit Feedback</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Reopen Button -->
+        <div class="mb-4">
+            <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#reopenModal">Reopen Complaint</button>
+        </div>
+
+        <!-- Reopen Modal -->
+        <div class="modal fade" id="reopenModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Reopen Complaint</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form method="POST" action="{{ url_for('citizen.reopen_complaint', id=complaint.id) }}">
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="reason" class="form-label">Reason for reopening <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="reason" name="reason" rows="3" placeholder="Explain why you want to reopen this complaint..." required></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-warning">Reopen</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if feedback %}
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0 fw-bold">Your Feedback</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-2">
+                    <strong>Rating:</strong> {{ '⭐' * feedback.rating }}
+                </div>
+                {% if feedback.comments %}
+                    <div>
+                        <strong>Comments:</strong> {{ feedback.comments }}
+                    </div>
+                {% endif %}
+                <div class="text-muted small mt-2">Submitted on {{ feedback.created_at }}</div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

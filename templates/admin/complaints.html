@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}All Complaints - Admin - Smart GP Portal{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">All Registered Complaints</h2>
+            <p class="text-muted mb-0">Search, filter, assign, and manage citizen grievances</p>
+        </div>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary btn-sm">&larr; Back to Dashboard</a>
+    </div>
+
+    <!-- Filter & Search Card -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <form method="GET" action="{{ url_for('admin.complaints') }}" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold">Status</label>
+                    <select name="status" class="form-select form-select-sm">
+                        <option value="">All Statuses</option>
+                        {% for s in ['Submitted', 'Under Review', 'Assigned', 'In Progress', 'Resolved', 'Reopened', 'Rejected', 'Closed'] %}
+                            <option value="{{ s }}" {% if status_filter == s %}selected{% endif %}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold">Category</label>
+                    <select name="category" class="form-select form-select-sm">
+                        <option value="">All Categories</option>
+                        {% for cat in categories %}
+                            <option value="{{ cat }}" {% if category_filter == cat %}selected{% endif %}>{{ cat }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-semibold">Ward</label>
+                    <select name="ward" class="form-select form-select-sm">
+                        <option value="">All Wards</option>
+                        {% for w in wards %}
+                            <option value="{{ w }}" {% if ward_filter == w %}selected{% endif %}>{{ w }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold">Search</label>
+                    <input type="text" name="q" value="{{ search_q }}" placeholder="ID or Title..." class="form-select form-select-sm">
+                </div>
+                <div class="col-md-1 d-flex align-items-end">
+                    <button type="submit" class="btn btn-success btn-sm w-100">Filter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Complaints Table -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            {% if complaints %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-3">Complaint ID</th>
+                                <th>Title</th>
+                                <th>Category</th>
+                                <th>Ward</th>
+                                <th>Status</th>
+                                <th>Submitted On</th>
+                                <th class="text-end pe-3">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for c in complaints %}
+                                <tr>
+                                    <td class="ps-3 fw-bold text-success">{{ c.complaint_uid }}</td>
+                                    <td>
+                                        <div class="fw-semibold">{{ c.title }}</div>
+                                        <small class="text-muted">{{ c.location_detail or 'Ward location' }}</small>
+                                    </td>
+                                    <td><span class="badge bg-light text-dark border">{{ c.category }}</span></td>
+                                    <td>{{ c.ward }}</td>
+                                    <td>
+                                        {% if c.status == 'Submitted' %}
+                                            <span class="badge bg-secondary">Submitted</span>
+                                        {% elif c.status == 'Under Review' %}
+                                            <span class="badge bg-info text-dark">Under Review</span>
+                                        {% elif c.status == 'Assigned' %}
+                                            <span class="badge bg-primary">Assigned</span>
+                                        {% elif c.status == 'In Progress' %}
+                                            <span class="badge bg-warning text-dark">In Progress</span>
+                                        {% elif c.status == 'Resolved' %}
+                                            <span class="badge bg-success">Resolved</span>
+                                        {% elif c.status == 'Reopened' %}
+                                            <span class="badge bg-danger">Reopened</span>
+                                        {% elif c.status == 'Rejected' %}
+                                            <span class="badge bg-dark">Rejected</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ c.status }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-muted small">{{ c.created_at }}</td>
+                                    <td class="text-end pe-3">
+                                        <a href="{{ url_for('admin.complaint_detail', id=c.id) }}" class="btn btn-sm btn-outline-primary">Manage</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <p class="text-muted mb-0">No complaints found matching the criteria.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+

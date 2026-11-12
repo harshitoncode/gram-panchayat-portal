@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Submit Complaint - Smart GP Portal{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+                    <h3 class="fw-bold mb-4 text-success">Submit a Complaint</h3>
+                    <form method="POST" action="{{ url_for('citizen.submit_complaint') }}" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Title <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="title" name="title" placeholder="Brief title of your complaint" required>
+                            <div class="form-text">Give a short, descriptive title for your complaint.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="description" name="description" rows="5" placeholder="Describe your complaint in detail..." required></textarea>
+                            <div class="form-text">Provide as much detail as possible to help us address your complaint.</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="category" class="form-label">Category <span class="text-danger">*</span></label>
+                                <select class="form-select" id="category" name="category" required>
+                                    <option value="" selected disabled>Select category</option>
+                                    {% for cat in categories %}
+                                        <option value="{{ cat }}">{{ cat }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="ward" class="form-label">Ward <span class="text-danger">*</span></label>
+                                <select class="form-select" id="ward" name="ward" required>
+                                    <option value="" selected disabled>Select ward</option>
+                                    {% for ward in wards %}
+                                        <option value="{{ ward }}">{{ ward }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="location_detail" class="form-label">Location Detail <small class="text-muted">(optional)</small></label>
+                            <input type="text" class="form-control" id="location_detail" name="location_detail" placeholder="e.g., Near the main temple, behind school">
+                        </div>
+                        <div class="mb-4">
+                            <label for="image" class="form-label">Upload Image <small class="text-muted">(optional)</small></label>
+                            <input type="file" class="form-control" id="image" name="image" accept="image/png,image/jpeg,image/jpg,image/gif">
+                            <div class="form-text">Supported formats: PNG, JPG, JPEG, GIF (Max 5MB)</div>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100 fw-semibold">Submit Complaint</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
